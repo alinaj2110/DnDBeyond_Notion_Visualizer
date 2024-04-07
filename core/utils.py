@@ -1,6 +1,7 @@
 import sys
 import os
 from pyppeteer import page
+from asyncio import sleep
 
 async def get_element(elementtags:str | list, page: page):
     if type(elementtags) is list:
@@ -19,18 +20,20 @@ async def highlight_element(element, page: page):
         await page.evaluate('(element) => { element.style.border = "10px solid purple"; }', element)
 
 
-async def list_all_elements(page: page):
+async def list_all_elements(page):
     with open("other_info_files/all_elements_dndbeyond.csv","w") as f:
         f.write("TAG,CLASS,ID\n")
         # Select all elements on the page using the wildcard selector '*'
-        all_elements = await page.querySelectorAll('*')
+        if page:
+            all_elements = await page.querySelectorAll('*')
 
-        # Iterate over the list of elements and print their information
-        for element in all_elements:
-            tag_name = await (await element.getProperty('tagName')).jsonValue()
-            class_name = await (await element.getProperty('className')).jsonValue()
-            id_name = await (await element.getProperty('id')).jsonValue()
-            f.write(f'{tag_name},{class_name},{id_name}\n')
+            # Iterate over the list of elements and print their information
+            for element in all_elements:
+                tag_name = await (await element.getProperty('tagName')).jsonValue()
+                class_name = await (await element.getProperty('className')).jsonValue()
+                id_name = await (await element.getProperty('id')).jsonValue()
+                if tag_name in ["DIV","SPAN"]:
+                    f.write(f'{tag_name},{class_name},{id_name}\n')
 
 def find_chrome_executable():
     # Windows

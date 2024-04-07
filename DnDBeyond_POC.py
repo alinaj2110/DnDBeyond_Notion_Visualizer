@@ -2,8 +2,8 @@ import asyncio
 from pyppeteer import launch
 from core.utils import *
 
-char_link = "https://www.dndbeyond.com/characters/76483006"
-
+#char_link = "https://www.dndbeyond.com/characters/76483006"
+char_link = "https://www.dndbeyond.com/characters/120033071/U6lo2s"
 
 async def main():
     # Launch the browser
@@ -18,7 +18,7 @@ async def main():
 
     # Navigate to a website
     await page.goto(char_link)
-    await asyncio.sleep(1)
+    await asyncio.sleep(5)
 
     combat_tags = ["#character-tools-target","ct-character-sheet__inner",
                     "ct-subsections", "ct-subsection ct-subsection--primary-box",
@@ -26,6 +26,7 @@ async def main():
     element = await get_element(combat_tags, page)
     await highlight_element(element, page)
     text = await get_text_content(element, page)
+    await list_all_elements(element)
     # Close the browser
     await browser.close()
 
