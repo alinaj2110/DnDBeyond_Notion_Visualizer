@@ -1,6 +1,23 @@
 import sys
 import os
 from pyppeteer import page
+
+async def get_element(elementtags:str | list, page: page):
+    if elementtags is list:
+        elementtags = " ".join(elementtags)
+    return await page.querySelector(" ".join(elementtags))
+
+async def get_text_content(element, page):
+    value = None
+    if element:
+        value = await page.evaluate("(el) => el.textContent", element)
+    return value
+
+async def highlight_element(element, page: page):
+    if element:
+        await page.evaluate('(element) => { element.style.border = "10px solid purple"; }', element)
+
+
 async def list_all_elements(page: page):
     with open("other_info_files/all_elements_dndbeyond.csv","w") as f:
         f.write("TAG,CLASS,ID\n")
