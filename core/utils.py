@@ -3,9 +3,10 @@ import os
 from pyppeteer import page
 
 async def get_element(elementtags:str | list, page: page):
-    if elementtags is list:
-        elementtags = " ".join(elementtags)
-    return await page.querySelector(" ".join(elementtags))
+    if type(elementtags) is list:
+        elementtags = list(map(lambda x: str(x).replace(" ","."), elementtags))
+        elementtags = " .".join(elementtags)
+    return await page.querySelector(elementtags)
 
 async def get_text_content(element, page):
     value = None

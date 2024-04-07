@@ -18,19 +18,20 @@ async def main():
 
     # Navigate to a website
     await page.goto(char_link)
+    await asyncio.sleep(1)
 
-
-    combat_tags = ["#character-tools-target",".ct-character-sheet__inner",
-                    ".ct-subsections" , ".ct-subsection.ct-subsection--primary-box",
-                    ".ddbc-tab-list",".ddbc-tab-list__content",".ddbc-tab-options__body"]
+    combat_tags = ["#character-tools-target","ct-character-sheet__inner",
+                    "ct-subsections", "ct-subsection ct-subsection--primary-box",
+                    "ddbc-tab-list","ddbc-tab-list__content","ddbc-tab-options__body"]
     element = await get_element(combat_tags, page)
     await highlight_element(element, page)
     text = await get_text_content(element, page)
     # Close the browser
     await browser.close()
 
-# Run the main function
-asyncio.run(main())
+if __name__ == "__main__":
+    # Run the main function
+    asyncio.run(main())
 
 
 
