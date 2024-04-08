@@ -22,11 +22,18 @@ async def main():
 
     combat_tags = ["#character-tools-target","ct-character-sheet__inner",
                     "ct-subsections", "ct-subsection ct-subsection--primary-box",
-                    "ddbc-tab-list","ddbc-tab-list__content","ddbc-tab-options__body"]
+                    "ddbc-tab-list","ddbc-tab-options__content"]#,"ct-actions-list"]
     element = await get_element(combat_tags, page)
     await highlight_element(element, page)
-    text = await get_text_content(element, page)
-    await list_all_elements(element)
+    await remove_highlight(element, page)
+
+    #Get all the sections of the actions
+    combat_action_list = await element.querySelectorAll(".ct-actions-list")
+    for comb_action in combat_action_list:
+        await highlight_element(comb_action, page)
+        text = await get_text_content(element, page)
+        await remove_highlight(comb_action, page)
+
     # Close the browser
     await browser.close()
 

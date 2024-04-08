@@ -19,6 +19,9 @@ async def highlight_element(element, page: page):
     if element:
         await page.evaluate('(element) => { element.style.border = "10px solid purple"; }', element)
 
+async def remove_highlight(element, page:page):
+    if element:
+        await page.evaluate('''(element) => {element.style.border = 'none'; }''', element)
 
 async def list_all_elements(page):
     with open("other_info_files/all_elements_dndbeyond.csv","w") as f:
