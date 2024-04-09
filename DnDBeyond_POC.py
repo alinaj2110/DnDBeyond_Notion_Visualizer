@@ -39,15 +39,13 @@ async def main():
                     "ddbc-tab-list","ddbc-tab-options__content"]
     # #ct-actions-list__heading
     element = await get_element(combat_tags, page)
-    await highlight_element(element, page)
-    await remove_highlight(element, page)
+    if debug_mode: await highlight_element(element, page)
 
     #Get all the sections of the actions
     combat_action_list = await element.querySelectorAll(".ct-actions-list")
     for comb_action in combat_action_list:
-        await highlight_element(comb_action, page)
+        if debug_mode: await highlight_element(comb_action, page)
         text = await get_text_content(comb_action, page)
-        await remove_highlight(comb_action, page)
 
     # Close the browser
     await browser.close()

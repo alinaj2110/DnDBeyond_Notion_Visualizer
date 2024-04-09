@@ -15,12 +15,12 @@ async def get_text_content(element, page):
         value = await page.evaluate("(el) => el.textContent", element)
     return value
 
+# Highlight the accessed element during debug mode
 async def highlight_element(element, page: page):
     if element:
-        await page.evaluate('(element) => { element.style.border = "10px solid purple"; }', element)
-
-async def remove_highlight(element, page:page):
-    if element:
+        await element._scrollIntoViewIfNeeded()
+        await page.evaluate('(element) => { element.style.border = "5px solid purple"; }', element)
+        await sleep(2)
         await page.evaluate('''(element) => {element.style.border = 'none'; }''', element)
 
 async def list_all_elements(page):
