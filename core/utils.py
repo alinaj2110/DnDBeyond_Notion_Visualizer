@@ -1,34 +1,36 @@
 import sys
 import os
-from pyppeteer import page
 from asyncio import sleep
+from core.Singleton import *
 
-async def get_element(elementtags:str | list, page: page):
+shared_data = Singleton()
+
+async def get_element(elementtags:str | list):
     if type(elementtags) is list:
         elementtags = list(map(lambda x: str(x).replace(" ","."), elementtags))
         elementtags = " .".join(elementtags)
-    return await page.querySelector(elementtags)
+    return await shared_data.page.querySelector(elementtags)
 
-async def get_text_content(element, page):
-    value = None
+async def get_text_content(element):
+    text = None
     if element:
-        value = await page.evaluate("(el) => el.textContent", element)
-    return value
+        text = await (await element.getProperty('textContent')).jsonValue()
+    return text
 
-async def highlight_element(element, page: page):
+# Highlight the accessed element during debug mode
+async def highlight_element(element):
     if element:
-        await page.evaluate('(element) => { element.style.border = "10px solid purple"; }', element)
+        await element._scrollIntoViewIfNeeded()
+        await shared_data.page.evaluate('(element) => { element.style.border = "5px solid purple"; }', element)
+        await sleep(2)
+        await shared_data.page.evaluate('''(element) => {element.style.border = 'none'; }''', element)
 
-async def remove_highlight(element, page:page):
-    if element:
-        await page.evaluate('''(element) => {element.style.border = 'none'; }''', element)
-
-async def list_all_elements(page):
+async def list_all_elements():
     with open("other_info_files/all_elements_dndbeyond.csv","w") as f:
         f.write("TAG,CLASS,ID\n")
         # Select all elements on the page using the wildcard selector '*'
-        if page:
-            all_elements = await page.querySelectorAll('*')
+        if shared_data.page:
+            all_elements = await shared_data.page.querySelectorAll('*')
 
             # Iterate over the list of elements and print their information
             for element in all_elements:
