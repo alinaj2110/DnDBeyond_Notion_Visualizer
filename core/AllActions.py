@@ -1,4 +1,5 @@
 from enum import Enum
+from core.utils import *
 
 
 class C_Actions(Enum):
@@ -8,23 +9,34 @@ class C_Actions(Enum):
     OTHER = "other"
 
 class AllActions:
-    def __init__(self, combat_stats_element, spellblock = None) -> None:
-        self.combat_stats_element = combat_stats_element
-        action_stats, bonus_stats, react_stats, others = self.__extract_all_stat_elements(combat_stats_element)
-        self.actions = Action(action_stats)
-        self.bonus_actions = BonusAction(bonus_stats)
-        self.reactions = Reactions(react_stats)
-        self.spells = Spells(spellblock)
+    def __init__(self) -> None:
+        pass
 
-    def __extract_type(self, title:str) -> C_Actions:
+    def __extract_type(self, content:str) -> C_Actions:
         for e in C_Actions:
-            if title.lower().startswith(e.value):
+            if content.lower().startswith(e.value):
                 return e
         raise KeyError("No action type found")
     
-    def __extract_all_stat_elements(self, stat_element):
-        return ("action","bonus","reaction","others")
+    async def extract_all_stat_elements(self, combat_stats_element, spellblock = None):
+        self.combat_stats_element = combat_stats_element
+        self.spells = Spells(spellblock)
 
+        #Get all the sections of the actions
+        combat_action_list = await combat_stats_element.querySelectorAll(".ct-actions-list")
+        for comb_action in combat_action_list:
+            # if DEBUG_ENABLED: await highlight_element(comb_action, page)
+            text = await (await comb_action.getProperty('textContent')).jsonValue()
+            typ = self.__extract_type(text)
+            match typ:
+                case C_Actions.ACTION:
+                    self.actions = Action(comb_action)
+                case C_Actions.BONUS_ACTION:
+                    self.bonus_actions = BonusAction(comb_action)
+                case C_Actions.REACTION:
+                    self.reactions = Reactions(comb_action)
+                case C_Actions.OTHER:
+                    self.others = comb_action
 
 class Action:
     def __init__(self, stats) -> None:

@@ -18,7 +18,7 @@ async def main():
     args = parser.parse_args()
     
     # Access the parsed arguments
-    debug_mode = args.debug
+    DEBUG_ENABLED = args.debug
 
     # Launch the browser
     exec_path = find_chrome_executable()
@@ -26,7 +26,7 @@ async def main():
         print("No Chrome Executable found")
         return
 
-    headless = False if debug_mode else True
+    headless = False if DEBUG_ENABLED else True
     browser = await launch(executablePath= exec_path, headless=headless, defaultViewport=None, args=['--window-size=1920,1080'])
     # Create a new page
     page = await browser.newPage()
@@ -40,14 +40,10 @@ async def main():
                     "ddbc-tab-list","ddbc-tab-options__content"]
     # #ct-actions-list__heading
     element = await get_element(combat_tags, page)
-    if debug_mode: await highlight_element(element, page)
+    if DEBUG_ENABLED: await highlight_element(element, page)
 
-    all_actions = AllActions(combat_stats_element=element)
-    #Get all the sections of the actions
-    combat_action_list = await element.querySelectorAll(".ct-actions-list")
-    for comb_action in combat_action_list:
-        if debug_mode: await highlight_element(comb_action, page)
-        text = await get_text_content(comb_action, page)
+    all_actions = AllActions()
+    await all_actions.extract_all_stat_elements(combat_stats_element=element)
 
     # Close the browser
     await browser.close()

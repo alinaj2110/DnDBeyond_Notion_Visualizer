@@ -3,6 +3,8 @@ import os
 from pyppeteer import page
 from asyncio import sleep
 
+DEBUG_ENABLED = False
+
 async def get_element(elementtags:str | list, page: page):
     if type(elementtags) is list:
         elementtags = list(map(lambda x: str(x).replace(" ","."), elementtags))
