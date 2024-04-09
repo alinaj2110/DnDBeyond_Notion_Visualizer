@@ -2,6 +2,7 @@ import argparse
 import asyncio
 from pyppeteer import launch
 from core.utils import *
+from core.AllActions import *
 from pyppeteer_stealth import stealth
 
 #char_link = "https://www.dndbeyond.com/characters/76483006"
@@ -41,6 +42,7 @@ async def main():
     element = await get_element(combat_tags, page)
     if debug_mode: await highlight_element(element, page)
 
+    all_actions = AllActions(combat_stats_element=element)
     #Get all the sections of the actions
     combat_action_list = await element.querySelectorAll(".ct-actions-list")
     for comb_action in combat_action_list:
