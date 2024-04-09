@@ -26,7 +26,7 @@ class AllActions:
         combat_action_list = await combat_stats_element.querySelectorAll(".ct-actions-list")
         for comb_action in combat_action_list:
             # if DEBUG_ENABLED: await highlight_element(comb_action, page)
-            text = await (await comb_action.getProperty('textContent')).jsonValue()
+            text = await get_text_content(element=comb_action)
             typ = self.__extract_type(text)
             match typ:
                 case C_Actions.ACTION:

@@ -11,11 +11,11 @@ async def get_element(elementtags:str | list, page: page):
         elementtags = " .".join(elementtags)
     return await page.querySelector(elementtags)
 
-async def get_text_content(element, page):
-    value = None
+async def get_text_content(element):
+    text = None
     if element:
-        value = await page.evaluate("(el) => el.textContent", element)
-    return value
+        text = await (await element.getProperty('textContent')).jsonValue()
+    return text
 
 # Highlight the accessed element during debug mode
 async def highlight_element(element, page: page):
