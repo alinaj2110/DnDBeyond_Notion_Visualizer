@@ -1,5 +1,6 @@
 from enum import Enum
 from core.utils import *
+from core.Singleton import *
 
 
 class C_Actions(Enum):
@@ -25,7 +26,7 @@ class AllActions:
         #Get all the sections of the actions
         combat_action_list = await combat_stats_element.querySelectorAll(".ct-actions-list")
         for comb_action in combat_action_list:
-            # if DEBUG_ENABLED: await highlight_element(comb_action, page)
+            if shared_data.debug_enabled : await highlight_element(comb_action)
             text = await get_text_content(element=comb_action)
             typ = self.__extract_type(text)
             match typ:
