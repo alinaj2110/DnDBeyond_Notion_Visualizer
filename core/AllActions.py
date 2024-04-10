@@ -26,7 +26,7 @@ class AllActions:
         #Get all the sections of the actions
         combat_action_list = await combat_stats_element.querySelectorAll(".ct-actions-list")
         for comb_action in combat_action_list:
-            if shared_data.debug_enabled : await highlight_element(comb_action)
+            # if shared_data.debug_enabled : await highlight_element(comb_action)
             text = await get_text_content(element=comb_action)
             typ = self.__extract_type(text)
             match typ:
@@ -41,15 +41,33 @@ class AllActions:
 
 class Action:
     def __init__(self, stats) -> None:
+        self.action_element = stats
+    
+    async def parse_actions(self):
+        pass
+
+    def add_to_action(self):
         pass
     
 
 class BonusAction:
     def __init__(self, stats) -> None:
+        self.bonus_stats = stats
+
+    async def parse_bonus_actions(self):
+        pass
+
+    def add_to_bonus_actions(self):
         pass
 
 class Reactions:
     def __init__(self, stats) -> None:
+        self.react_stats = stats
+   
+    async def parse_reactions(self):
+        pass
+
+    def add_to_reactions(self):
         pass
 
 class Spells:
