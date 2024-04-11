@@ -26,7 +26,7 @@ class AllActions:
         #Get all the sections of the actions
         combat_action_list = await combat_stats_element.querySelectorAll(".ct-actions-list")
         for comb_action in combat_action_list:
-            # if shared_data.debug_enabled : await highlight_element(comb_action)
+            if shared_data.debug_enabled : await highlight_element(comb_action)
             text = await get_text_content(element=comb_action)
             typ = self.__extract_type(text)
             match typ:
@@ -45,59 +45,78 @@ class AllActions:
 class Section:
     def __init__(self, stats) -> None:
         self.stats_element = stats
+        self.basic_activatable = None
+        self.activatables = {}
+    
+    async def parse_activatables(self, activatable_elements):
+        '''
+        activatable
+        |- ct-feature-snippet__heading
+        |- ct-feature-snippet__content
+            |- ddbc-snippet  ddbc-snippet--parsed
+        '''
+        for activatable in activatable_elements:
+            if shared_data.debug_enabled : await highlight_element(activatable)
+            feature_name = str(await get_text_content(await activatable.querySelector(".ct-feature-snippet__heading"))).strip()
+            feature_description = await get_text_content(await activatable.querySelector(".ct-feature-snippet__content .ddbc-snippet.ddbc-snippet--parsed"))
+            self.activatables[feature_name] = feature_description
     
     async def parse_contents(self):
-        pass
+        '''
+        basic
+        |- ct-actions-list__basic-heading
+        |- ct-actions-list__basic-list
+        '''
+        basic = await self.stats_element.querySelector(".ct-actions-list__content .ct-actions-list__basic")
+        if shared_data.debug_enabled : await highlight_element(basic)
+        self.basic_activatable = await get_text_content(await basic.querySelector(".ct-actions-list__basic-list"))
+        activatables = await self.stats_element.querySelectorAll(".ct-actions-list__content .ct-actions-list__activatable")
+        await self.parse_activatables(activatables) 
     
     def add_other_content(self):
         pass
 
-class Action(Section): 
-    async def parse_contents(self):
-        '''
-        ct-actions-list
-        |-ct-actions-list__heading
-            |-ct-actions__attacks-heading  -- for action and attack #
-        |-ct-actions-list__content
-            |- ddbc-attack-table
-                |-ddbc-attack-table__row-header
-                |ddbc-attack-table__content
-                    |-ddbc-combat-attack__name
-            |-ct-actions-list__basic
-            |-ct-actions-list__activatable [list]
-                |-ct-feature-snippet
-        '''
-        # if shared_data.debug_enabled : await highlight_element(self.action_element)
-        print("THE ACTION CLASS IS PARSING")
-
+class Action(Section):
+    '''
+    ct-actions-list
+    |-ct-actions-list__heading
+        |-ct-actions__attacks-heading  -- for action and attack #
+    |-ct-actions-list__content
+        |- ddbc-attack-table
+            |-ddbc-attack-table__row-header
+            |ddbc-attack-table__content
+                |-ddbc-combat-attack__name
+        |-ct-actions-list__basic
+        |-ct-actions-list__activatable [list]
+            |-ct-feature-snippet
+    '''
+    pass
     
 
 class BonusAction(Section):
-    async def parse_contents(self):
-        '''
-        ct-actions-list
-        |-ct-actions-list__heading
-            |-ct-actions__attacks-heading 
-        |-ct-actions-list__content
-            |-ct-actions-list__basic
-            |-ct-actions-list__activatable [list]
-                |-ct-feature-snippet
-        '''
-        print("THE BONUS ACTION CLASS IS PARSING")
+    '''
+    ct-actions-list
+    |-ct-actions-list__heading
+        |-ct-actions__attacks-heading 
+    |-ct-actions-list__content
+        |-ct-actions-list__basic
+        |-ct-actions-list__activatable [list]
+            |-ct-feature-snippet
+    '''
+    pass
 
 
 class Reactions(Section):
-    async def parse_contents(self):
-        '''
-        ct-actions-list
-        |-ct-actions-list__heading
-            |-ct-actions__attacks-heading 
-        |-ct-actions-list__content
-            |-ct-actions-list__basic
-            |-ct-actions-list__activatable [list]
-                |-ct-feature-snippet
-        '''
-        print("THE REACTION CLASS IS PARSING")
+    '''
+    ct-actions-list
+    |-ct-actions-list__heading
+        |-ct-actions__attacks-heading 
+    |-ct-actions-list__content
+        |-ct-actions-list__basic
+        |-ct-actions-list__activatable [list]
+            |-ct-feature-snippet
+    '''
+    pass
 
 
 class Spells:
