@@ -38,11 +38,7 @@ async def main():
     await shared_data.page.goto(char_link)
     await asyncio.sleep(5)
 
-    combat_tags = ["#character-tools-target","ct-character-sheet__inner",
-                    "ct-subsections", "ct-subsection ct-subsection--primary-box",
-                    "ddbc-tab-list","ddbc-tab-options__content"]
-    # #ct-actions-list__heading
-    element = await get_element(combat_tags)
+    element = await shared_data.page.querySelector(".ddbc-tab-options__content")
     if shared_data.debug_enabled: await highlight_element(element)
 
     all_actions = AllActions()
