@@ -38,11 +38,11 @@ async def main():
     await shared_data.page.goto(char_link)
     await asyncio.sleep(5)
 
-    element = await shared_data.page.querySelector(".ddbc-tab-options__content")
-    if shared_data.debug_enabled: await highlight_element(element)
+    allAction_element = await shared_data.page.querySelector(".ddbc-tab-options__content")
+    if shared_data.debug_enabled: await highlight_element(allAction_element)
 
     all_actions = AllActions()
-    await all_actions.extract_all_stat_elements(combat_stats_element=element)
+    await all_actions.extract_all_stat_elements(allAction_element)
 
     # Close the browser
     await browser.close()
