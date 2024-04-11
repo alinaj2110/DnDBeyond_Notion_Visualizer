@@ -48,30 +48,33 @@ class Section:
         self.basic_activatable = None
         self.activatables = {}
     
-    async def parse_activatables(self, activatable_elements):
+    async def parse_basic_activatable(self):
+        '''
+        basic
+        |- ct-actions-list__basic-heading
+        |- ct-actions-list__basic-list
+        '''
+        basic = await self.stats_element.querySelector(".ct-actions-list__content .ct-actions-list__basic .ct-actions-list__basic-list")
+        if shared_data.debug_enabled : await highlight_element(basic)
+        self.basic_activatable = await get_text_content(basic)
+
+    async def parse_activatables(self):
         '''
         activatable
         |- ct-feature-snippet__heading
         |- ct-feature-snippet__content
             |- ddbc-snippet  ddbc-snippet--parsed
         '''
+        activatable_elements = await self.stats_element.querySelectorAll(".ct-actions-list__content .ct-actions-list__activatable")
         for activatable in activatable_elements:
             if shared_data.debug_enabled : await highlight_element(activatable)
             feature_name = str(await get_text_content(await activatable.querySelector(".ct-feature-snippet__heading"))).strip()
             feature_description = await get_text_content(await activatable.querySelector(".ct-feature-snippet__content .ddbc-snippet.ddbc-snippet--parsed"))
             self.activatables[feature_name] = feature_description
-    
-    async def parse_contents(self):
-        '''
-        basic
-        |- ct-actions-list__basic-heading
-        |- ct-actions-list__basic-list
-        '''
-        basic = await self.stats_element.querySelector(".ct-actions-list__content .ct-actions-list__basic")
-        if shared_data.debug_enabled : await highlight_element(basic)
-        self.basic_activatable = await get_text_content(await basic.querySelector(".ct-actions-list__basic-list"))
-        activatables = await self.stats_element.querySelectorAll(".ct-actions-list__content .ct-actions-list__activatable")
-        await self.parse_activatables(activatables) 
+
+    async def parse_contents(self):        
+        await self.parse_basic_activatable()
+        await self.parse_activatables() 
     
     def add_other_content(self):
         pass
@@ -90,7 +93,22 @@ class Action(Section):
         |-ct-actions-list__activatable [list]
             |-ct-feature-snippet
     '''
-    pass
+    async def parse_attack_table(self):
+        '''
+        ddbc-attack-table
+        |-
+            |- ddbc-combat-attack--item ddbc-combat-item-attack--melee ddbc-combat-attack
+            |- ddbc-combat-attack--item ddbc-combat-item-attack--ranged ddbc-combat-attack
+            |- ddbc-combat-attack--spell ddbc-combat-attack
+            |- ddbc-combat-action-attack-weapon ddbc-combat-attack
+                |- ddbc-combat-attack__label 
+        '''
+        print("Attack table parsed")
+    
+    async def parse_contents(self):
+        await self.parse_attack_table()     
+        await self.parse_basic_activatable()
+        await self.parse_activatables() 
     
 
 class BonusAction(Section):
