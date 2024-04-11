@@ -99,11 +99,14 @@ class Action(Section):
         |-
             |- ddbc-combat-attack--item ddbc-combat-item-attack--melee ddbc-combat-attack
             |- ddbc-combat-attack--item ddbc-combat-item-attack--ranged ddbc-combat-attack
-            |- ddbc-combat-attack--spell ddbc-combat-attack
-            |- ddbc-combat-action-attack-weapon ddbc-combat-attack
                 |- ddbc-combat-attack__label 
         '''
-        print("Attack table parsed")
+        attack_table = await self.stats_element.querySelector(".ddbc-attack-table")
+        self.melee_weapons = await attack_table.querySelectorAll(".ddbc-combat-item-attack--melee .ddbc-combat-attack__label")
+        self.ranged_weapons = await attack_table.querySelectorAll(".ddbc-combat-item-attack--ranged .ddbc-combat-attack__label")
+
+        self.melee_weapons = [await get_text_content(x) for x in self.melee_weapons]
+        self.ranged_weapons = [await get_text_content(x) for x in self.ranged_weapons]
     
     async def parse_contents(self):
         await self.parse_attack_table()     
