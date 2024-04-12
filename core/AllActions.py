@@ -19,12 +19,13 @@ class AllActions:
                 return e
         raise KeyError("No action type found")
     
-    async def extract_all_stat_elements(self, combat_stats_element, spellblock = None):
-        self.combat_stats_element = combat_stats_element
-        self.spells = Spells(spellblock)
+    async def extract_all_stat_elements(self):
+        await (await shared_data.page.querySelector(".ct-primary-box__tab--actions.ddbc-tab-list__nav-item")).click()
+        self.combat_stats_element = await shared_data.page.querySelector(".ct-actions")
+        if shared_data.debug_enabled: await highlight_element(self.combat_stats_element)
 
         #Get all the sections of the actions
-        combat_action_list = await combat_stats_element.querySelectorAll(".ct-actions-list")
+        combat_action_list = await self.combat_stats_element.querySelectorAll(".ct-actions-list")
         for comb_action in combat_action_list:
             if shared_data.debug_enabled : await highlight_element(comb_action)
             text = await get_text_content(element=comb_action)
@@ -141,8 +142,19 @@ class Reactions(Section):
 
 
 class Spells:
-    def __init__(self, spellblock) -> None:
-        self.spellblock = spellblock
+    def __init__(self) -> None:
+        pass
+
+    async def extract_all_spells(self):
+        self.spell_button = await shared_data.page.querySelector(".ct-primary-box__tab--spells.ddbc-tab-list__nav-item")
+        if self.spell_button:
+            await  self.spell_button.click()
+            self.spells_element = await shared_data.page.querySelector(".ct-spells")
+            if shared_data.debug_enabled: await highlight_element(self.spells_element)
+        else:
+            self.spells_element = None
+
+
 
         
 '''
