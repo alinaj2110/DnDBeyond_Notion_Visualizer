@@ -149,17 +149,18 @@ class Spells:
     async def get_group_spells(self,group):
         group_name = await get_text_content(await group.querySelector(".ct-content-group__header-content"))
         print(group_name)
-        Conc_spells = []
-        other_spells = []
+        Conc_spells = {'1A': [],'1BA': []}
+        other_spells = {'1A': [],'1BA': [],'1R':[]}
         all_spells = await group.querySelectorAll(".ct-spells-spell")
         for spell in all_spells:
             upscale =await get_text_content(await spell.querySelector(".ct-spells-spell__scaled-level")) 
             spell_name = await get_text_content(await spell.querySelector(".ddbc-spell-name"))
             conc = bool(await spell.querySelector(".ddbc-concentration-icon"))
             spell_time = await get_text_content(await spell.querySelector(".ct-spells-spell__activation"))
-            if not upscale:
-                s = f"< {spell_name}, {spell_time} >"
-                Conc_spells.append(spell_name) if conc else other_spells.append(spell_name)
+            if not upscale and conc:
+                Conc_spells[spell_time].append(spell_name)
+            elif not upscale: 
+                other_spells[spell_time].append(spell_name)
         return group_name, Conc_spells, other_spells
 
     async def extract_all_spells(self):
