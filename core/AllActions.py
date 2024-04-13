@@ -145,14 +145,58 @@ class Spells:
     def __init__(self) -> None:
         pass
 
+    async def get_group_spells(self,group):
+        group_name = await get_text_content(await group.querySelector(".ct-content-group__header-content"))
+        print(group_name)
+        Conc_spells = []
+        other_spells = []
+        all_spells = await group.querySelectorAll(".ct-spells-spell")
+        for i, spell in enumerate(all_spells):
+            upscale =await get_text_content(await spell.querySelector(".ct-spells-spell__scaled-level")) 
+            spell_name = await get_text_content(await spell.querySelector(".ddbc-spell-name"))
+            conc = bool(await spell.querySelector(".ddbc-concentration-icon"))
+            spell_time = await get_text_content(await spell.querySelector(".ct-spells-spell__activation"))
+            if not upscale:
+                print(f"({i+1}) < {spell_name}, {conc}, {spell_time} >")
+
     async def extract_all_spells(self):
+        '''
+        ct-spells
+        |- ct-spells__content
+            |- ddbc-tab-options__body
+                |- ct-content-group
+                    |- ct-content-group__header //Spell Group Level
+                    |- ct-content-group__content
+                        |- ct-spells-level
+                            |- ct-spells-level__spells-content //all spells in groups
+                                |- ct-spells-spell  //individual spell
+                                    |- ct-spells-spell__action  //for the casting button/at will
+                                        |-ct-theme-button ct-theme-button--filled ct-button character-button ddbc-button character-button-block-small
+                                        (If upscaled)
+                                        |-ct-button__content
+                                            |-ct-spells-spell__scaled-level
+
+                                    |- ct-spells-spell__label 
+                                        |- ddbc-spell-name
+                                        (if concentration)
+                                        |-ddbc-svg ddbc-spell-name__icon ddbc-concentration-icon
+                                    (if upscaled)
+                                    |-ct-spells-spell__label ct-spells-spell__label--scaled
+                                    
+                                    |- ct-spells-spell__activation
+
+        '''
         self.spell_button = await shared_data.page.querySelector(".ct-primary-box__tab--spells.ddbc-tab-list__nav-item")
-        if self.spell_button:
-            await  self.spell_button.click()
-            self.spells_element = await shared_data.page.querySelector(".ct-spells")
-            if shared_data.debug_enabled: await highlight_element(self.spells_element)
-        else:
+        if not self.spell_button:
             self.spells_element = None
+            return
+        
+        await  self.spell_button.click()
+        all_groups = await shared_data.page.querySelectorAll(".ct-spells .ct-content-group")
+        for group in all_groups:
+            if shared_data.debug_enabled: await highlight_element(group)
+            await self.get_group_spells(group)
+
 
 
 
