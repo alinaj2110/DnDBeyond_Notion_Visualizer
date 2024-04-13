@@ -143,7 +143,8 @@ class Reactions(Section):
 
 class Spells:
     def __init__(self) -> None:
-        pass
+        self.conc_spells = {}
+        self.other_spells = {}
 
     async def get_group_spells(self,group):
         group_name = await get_text_content(await group.querySelector(".ct-content-group__header-content"))
@@ -151,13 +152,15 @@ class Spells:
         Conc_spells = []
         other_spells = []
         all_spells = await group.querySelectorAll(".ct-spells-spell")
-        for i, spell in enumerate(all_spells):
+        for spell in all_spells:
             upscale =await get_text_content(await spell.querySelector(".ct-spells-spell__scaled-level")) 
             spell_name = await get_text_content(await spell.querySelector(".ddbc-spell-name"))
             conc = bool(await spell.querySelector(".ddbc-concentration-icon"))
             spell_time = await get_text_content(await spell.querySelector(".ct-spells-spell__activation"))
             if not upscale:
-                print(f"({i+1}) < {spell_name}, {conc}, {spell_time} >")
+                s = f"< {spell_name}, {spell_time} >"
+                Conc_spells.append(spell_name) if conc else other_spells.append(spell_name)
+        return group_name, Conc_spells, other_spells
 
     async def extract_all_spells(self):
         '''
@@ -195,7 +198,9 @@ class Spells:
         all_groups = await shared_data.page.querySelectorAll(".ct-spells .ct-content-group")
         for group in all_groups:
             if shared_data.debug_enabled: await highlight_element(group)
-            await self.get_group_spells(group)
+            name, c_spell, o_spell = await self.get_group_spells(group)
+            self.conc_spells[name] = c_spell
+            self.other_spells[name] = o_spell
 
 
 
