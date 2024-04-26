@@ -10,8 +10,8 @@ class C_Actions(Enum):
     OTHER = "other"
 
 class AllActions:
-    def __init__(self) -> None:
-        pass
+    def __init__(self, tab_button) -> None:
+        self.tab_button = tab_button
 
     def __extract_type(self, content:str) -> C_Actions:
         for e in C_Actions:
@@ -20,7 +20,7 @@ class AllActions:
         raise KeyError("No action type found")
     
     async def extract_all_stat_elements(self):
-        await (await shared_data.page.querySelector(".ct-primary-box__tab--actions.ddbc-tab-list__nav-item")).click()
+        await self.tab_button.click()
         self.combat_stats_element = await shared_data.page.querySelector(".ct-actions")
         if shared_data.debug_enabled: await highlight_element(self.combat_stats_element)
 
@@ -142,9 +142,13 @@ class Reactions(Section):
 
 
 class Spells:
-    def __init__(self) -> None:
-        self.conc_spells = {}
-        self.other_spells = {}
+    def __init__(self, spell_button) -> None:
+        self.spell_button = spell_button
+        self.conc_spells_1A = []
+        self.other_spells_1A = []
+        self.conc_spells_1BA = []
+        self.other_spells_1BA = []
+        self.other_spells_1R = []
 
     async def get_group_spells(self,group):
         group_name = await get_text_content(await group.querySelector(".ct-content-group__header-content"))
@@ -157,11 +161,18 @@ class Spells:
             spell_name = await get_text_content(await spell.querySelector(".ddbc-spell-name"))
             conc = bool(await spell.querySelector(".ddbc-concentration-icon"))
             spell_time = await get_text_content(await spell.querySelector(".ct-spells-spell__activation"))
-            if not upscale and conc:
-                Conc_spells[spell_time].append(spell_name)
-            elif not upscale: 
-                other_spells[spell_time].append(spell_name)
-        return group_name, Conc_spells, other_spells
+            # if not upscale and conc:
+            #     Conc_spells[spell_time].append(spell_name)
+            # elif not upscale: 
+            #     other_spells[spell_time].append(spell_name)
+            if not upscale:
+                match spell_time:
+                    case '1A':
+                        self.conc_spells_1A.append((group_name,spell_name)) if conc else self.other_spells_1A.append((group_name,spell_name))
+                    case '1BA':
+                        self.conc_spells_1BA.append((group_name,spell_name)) if conc else self.other_spells_1BA.append((group_name,spell_name))
+                    case '1R':
+                        self.other_spells_1R.append((group_name,spell_name))
 
     async def extract_all_spells(self):
         '''
@@ -190,7 +201,6 @@ class Spells:
                                     |- ct-spells-spell__activation
 
         '''
-        self.spell_button = await shared_data.page.querySelector(".ct-primary-box__tab--spells.ddbc-tab-list__nav-item")
         if not self.spell_button:
             self.spells_element = None
             return
@@ -199,9 +209,7 @@ class Spells:
         all_groups = await shared_data.page.querySelectorAll(".ct-spells .ct-content-group")
         for group in all_groups:
             if shared_data.debug_enabled: await highlight_element(group)
-            name, c_spell, o_spell = await self.get_group_spells(group)
-            self.conc_spells[name] = c_spell
-            self.other_spells[name] = o_spell
+            await self.get_group_spells(group)
 
 
 

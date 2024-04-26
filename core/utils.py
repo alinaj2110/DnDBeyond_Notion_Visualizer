@@ -11,6 +11,15 @@ async def get_element(elementtags:str | list):
         elementtags = " .".join(elementtags)
     return await shared_data.page.querySelector(elementtags)
 
+async def get_tab_button(tabstr:str):
+    tabstr = tabstr.lower()
+    tab_buttons = await shared_data.page.querySelectorAll('.styles_tabs__aTttL button')
+    for btn in tab_buttons:
+        btn_txt = await get_text_content(btn)
+        if tabstr == btn_txt.lower():
+            return btn
+    return None
+
 async def get_text_content(element):
     text = None
     if element:

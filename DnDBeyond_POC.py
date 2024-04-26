@@ -6,8 +6,8 @@ from core.AllActions import *
 from core.Singleton import *
 from pyppeteer_stealth import stealth
 
-char_link = "https://www.dndbeyond.com/characters/76483006"
-# char_link = "https://www.dndbeyond.com/characters/120033071/U6lo2s"
+# char_link = "https://www.dndbeyond.com/characters/76483006"
+char_link = "https://www.dndbeyond.com/characters/120033071/U6lo2s"
 
 async def main():
 
@@ -38,10 +38,13 @@ async def main():
     await shared_data.page.goto(char_link)
     await asyncio.sleep(5)
 
-    all_actions = AllActions()
+    action_button = await get_tab_button("Actions")
+    spells_button = await get_tab_button("Spells")
+    
+    all_actions = AllActions(action_button)
     await all_actions.extract_all_stat_elements()
 
-    all_spells = Spells()
+    all_spells = Spells(spells_button)
     await all_spells.extract_all_spells()
 
     # Close the browser
